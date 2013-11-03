@@ -1,0 +1,27 @@
+{
+  "manifest_version": 2,
+
+  "name": "NBN Check for RealEstate.com.au",
+  "description": "Checks NBN status for property list on realestate.com.au",
+  "version": "1.0",
+
+  "background": {
+    "page": "background.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://www.realestate.com.au/*"],
+      "js": ["jquery-1.10.2.js", "rea_content_script.js"]
+    },
+    {
+      "matches": ["http://www.nbnco.com.au/*"],
+      "js": ["jquery-1.10.2.js", "nbn_content_script.js"]
+    }
+  ],
+
+  "permissions": [
+    "https://realestate.com.au/",
+    "http://www.nbnco.com.au/",
+    "https://maps.googleapis.com/"
+  ]
+}
