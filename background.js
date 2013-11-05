@@ -101,33 +101,43 @@ function geoFailResponse(geo) {
 	}
 }
 
-function withGeo(address, key, sendResponse, geo) {
-	if (geo.status == 'OK') {
-		localStorage[key] = JSON.stringify(geo)
-
-		// Parse the result geo into query data
-		nbn_req_data = geo.results[0].geometry.location
-		address_components = geo.results[0].address_components
-		for (i = 0; i < address_components.length; i++) {
-			comp = address_components[i]
-			for (j = 0; j < comp.types.length; j++) {
-				if (comp.types[j] in address_components_map) {
-					nbn_req_data[address_components_map[comp.types[j]]] = comp.short_name
-				}
+function geoToQueryParams(geo) {
+	// Parse the result geo into query data
+	var nbn_req_data = geo.results[0].geometry.location
+	address_components = geo.results[0].address_components
+	for (i = 0; i < address_components.length; i++) {
+		comp = address_components[i]
+		for (j = 0; j < comp.types.length; j++) {
+			if (comp.types[j] in address_components_map) {
+				nbn_req_data[address_components_map[comp.types[j]]] = comp.short_name
 			}
 		}
+	}
 
-		// Corner case street numbers
-		if (!('streetNumber' in nbn_req_data)) {
-			number = streetNumber(address, nbn_req_data)
-			if (number === null) {
-				console.log("Unable to find a number for %s: %O", address, geo)
-				sendResponse(responseObject(
-					"Failed to parse address", 'failure'))
-				return
-			} else {
-				nbn_req_data['streetNumber'] = number
-			}
+	// Corner case street numbers
+	if (!('streetNumber' in nbn_req_data)) {
+		number = streetNumber(address, nbn_req_data)
+		if (number === null) {
+			console.log("Unable to find a number for %s: %O", address, geo)
+			return null
+		} else {
+			nbn_req_data['streetNumber'] = number
+		}
+	}
+
+	return nbn_req_data
+}
+
+function withGeo(address, key, sendResponse, geo) {
+	var nbn_req_data
+	if (geo.status == 'OK') {
+		localStorage[key] = JSON.stringify(geo)
+		nbn_req_data = geoToQueryParams(geo)
+
+		if (nbn_req_data === null) {
+			sendResponse(responseObject(
+				"Failed to parse address", 'failure'))
+			return
 		}
 
 		sendNBNMessage({'type': 'lookup', 'data': nbn_req_data}, function(response) {
