@@ -17,6 +17,21 @@ nbn_color_map = {
 
 nbn_tabs = []
 
+
+/***
+ * Message handling
+ */
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+	console.log('Message [%s]: %O', request['type'], request)
+
+	if (request.type == "nbn_tab") {
+		nbn_tabs.push(sender.tab)
+	} else if (request.type == "lookup") {
+		return doLookup(request, sendResponse)
+	}
+})
+
+
 function hashCode(s){
 	return s.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);              
 }
@@ -72,19 +87,6 @@ function responseObject(message, type) {
 		'color': color
 	}
 }
-
-/***
- * Message handling
- */
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-	console.log('Message [%s]: %O', request['type'], request)
-
-	if (request.type == "nbn_tab") {
-		nbn_tabs.push(sender.tab)
-	} else if (request.type == "lookup") {
-		return doLookup(request, sendResponse)
-	}
-})
 
 function withGeo(address, key, sendResponse, geo) {
 	if (geo.status == 'OK') {
