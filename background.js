@@ -1,7 +1,6 @@
 nbn_tabs = []
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-	console.log("REQUEST")
-	console.dir(request)
+	console.log('Message [%s]: %O', request['type'], request)
 	if (request.type == "nbn_tab") {
 		console.log("New NBN Tab: " + sender.tab.id)
 		nbn_tabs.push(sender.tab)
