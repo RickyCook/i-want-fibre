@@ -88,6 +88,19 @@ function responseObject(message, type) {
 	}
 }
 
+function geoFailResponse(geo) {
+	if (geo.status == 'ZERO_RESULTS') {
+		return responseObject(
+			"Unknown address", 'failure')
+	} else if (geo.status == 'OVER_QUERY_LIMIT') {
+		return responseObject(
+			"Over query limit (try reloading the page)", 'failure')
+	} else {
+		return responseObject(
+			"Failed to load address", 'failure')
+	}
+}
+
 function withGeo(address, key, sendResponse, geo) {
 	if (geo.status == 'OK') {
 		localStorage[key] = JSON.stringify(geo)
@@ -129,16 +142,7 @@ function withGeo(address, key, sendResponse, geo) {
 		})
 	} else {
 		console.log("Address lookup failed for %s: %O", address, geo)
-		if (geo.status == 'ZERO_RESULTS') {
-			sendResponse(responseObject(
-				"Unknown address", 'failure'))
-		} else if (geo.status == 'OVER_QUERY_LIMIT') {
-			sendResponse(responseObject(
-				"Over query limit (try reloading the page)", 'failure'))
-		} else {
-			sendResponse(responseObject(
-				"Failed to load address", 'failure'))
-		}
+		sendResponse(geoFailResponse(geo))
 	}
 }
 
