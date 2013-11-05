@@ -14,17 +14,28 @@ nbn_color_map = {
 function localStorageKey(text) {
 	return 'nbn_geo_' + hashCode(text)
 }
-function streetNumber(address, geo, method=0) {
+
+function streetNumber(address, geo, method) {
+	if (typeof(method) === 'undefined') method = 0
+
+	var number = null
 	if (method === 0) {
-		matches = el.text.match(/\d+[\/\\]\d+/)
+		matches = address.match(new RegExp('\\d+[/\\\\]\\d+'))
 		if (!(matches === null)) {
-			return matches[0].replace(/\d+[\/\\]/, '')
-		} else {
-			return streetNumber(address, geo, method + 1)
+			number = matches[0].replace(new RegExp('\\d+[/\\\\]'), '')
+		}
+	} else if (method === 1) {
+		matches = address.match(new RegExp('^\\d+'))
+		if (!(matches === null)) {
+			number = matches[0]
 		}
 	}
 
-	return null
+	if (method < 1 && number === null) {
+		return streetNumber(address, geo, method + 1)
+	}
+
+	return number
 }
 $('[rel="listingName"]').each(function(k, el) {
 	console.log(el.text)
@@ -51,10 +62,11 @@ $('[rel="listingName"]').each(function(k, el) {
 
 			// Corner case street numbers
 			if (!('streetNumber' in nbn_req_data)) {
-				number = streetNumber(el.text, geo)
+				number = streetNumber(el.text, nbn_req_data)
 				if (number === null) {
 					content_el.textContent = "Failed to parse address"
 					content_el.style.color = 'orange'
+					console.log("Unable to find a number for %s: %O", el.text, geo)
 					return
 				} else {
 					nbn_req_data['streetNumber'] = number
@@ -76,11 +88,13 @@ $('[rel="listingName"]').each(function(k, el) {
 		} else {
 			if (geo.status == 'ZERO_RESULTS') {
 				content_el.textContent = "Unknown address"
+			} else if (geo.status == 'OVER_QUERY_LIMIT') {
+				content_el.textContent = "Over query limit (try reloading the page)"
 			} else {
 				content_el.textContent = "Failed to load address"
 			}
 			content_el.style.color = 'orange'
-			console.log("Address lookup failed: %O", geo)
+			console.log("Address lookup failed for %s: %O", el.text, geo)
 		}
 	}
 
