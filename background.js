@@ -121,7 +121,6 @@ function doLookup(request, sendResponse) {
 			}
 
 			sendNBNMessage({'type': 'lookup', 'data': nbn_req_data}, function(response) {
-				var color
 				if (response.servingArea === null) {
 					sendResponse(responseObject(
 						"NBN is unavailable", 'unavailable'))
