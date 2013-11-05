@@ -5,7 +5,7 @@
   "description": "Do you want NBN fibre to go with you shiney new place? Well
     it's just annoying to manually check. I Want Fibre automatically checks NBN
     status for property list on realestate.com.au",
-  "version": "1.0",
+  "version": "0.1",
 
   "background": {
     "page": "background.html"
