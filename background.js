@@ -86,73 +86,72 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	}
 })
 
+function withGeo(address, key, sendResponse, geo) {
+	if (geo.status == 'OK') {
+		localStorage[key] = JSON.stringify(geo)
+
+		// Parse the result geo into query data
+		nbn_req_data = geo.results[0].geometry.location
+		address_components = geo.results[0].address_components
+		for (i = 0; i < address_components.length; i++) {
+			comp = address_components[i]
+			for (j = 0; j < comp.types.length; j++) {
+				if (comp.types[j] in address_components_map) {
+					nbn_req_data[address_components_map[comp.types[j]]] = comp.short_name
+				}
+			}
+		}
+
+		// Corner case street numbers
+		if (!('streetNumber' in nbn_req_data)) {
+			number = streetNumber(address, nbn_req_data)
+			if (number === null) {
+				console.log("Unable to find a number for %s: %O", address, geo)
+				sendResponse(responseObject(
+					"Failed to parse address", 'failure'))
+				return
+			} else {
+				nbn_req_data['streetNumber'] = number
+			}
+		}
+
+		sendNBNMessage({'type': 'lookup', 'data': nbn_req_data}, function(response) {
+			if (response.servingArea === null) {
+				sendResponse(responseObject(
+					"NBN is unavailable", 'unavailable'))
+			} else {
+				sendResponse(responseObject(
+					response.servingArea.serviceType + " is " + response.servingArea.serviceStatus,
+					response.servingArea.serviceStatus))
+			}
+		})
+	} else {
+		console.log("Address lookup failed for %s: %O", address, geo)
+		if (geo.status == 'ZERO_RESULTS') {
+			sendResponse(responseObject(
+				"Unknown address", 'failure'))
+		} else if (geo.status == 'OVER_QUERY_LIMIT') {
+			sendResponse(responseObject(
+				"Over query limit (try reloading the page)", 'failure'))
+		} else {
+			sendResponse(responseObject(
+				"Failed to load address", 'failure'))
+		}
+	}
+}
+
 function doLookup(request, sendResponse) {
 	var
 		address = request.address,
 		key = localStorageKey(address)
 
-	withGeo = function(geo) {
-		if (geo.status == 'OK') {
-			localStorage[key] = JSON.stringify(geo)
-
-			// Parse the result geo into query data
-			nbn_req_data = geo.results[0].geometry.location
-			address_components = geo.results[0].address_components
-			for (i = 0; i < address_components.length; i++) {
-				comp = address_components[i]
-				for (j = 0; j < comp.types.length; j++) {
-					if (comp.types[j] in address_components_map) {
-						nbn_req_data[address_components_map[comp.types[j]]] = comp.short_name
-					}
-				}
-			}
-
-			// Corner case street numbers
-			if (!('streetNumber' in nbn_req_data)) {
-				number = streetNumber(address, nbn_req_data)
-				if (number === null) {
-					console.log("Unable to find a number for %s: %O", address, geo)
-					sendResponse(responseObject(
-						"Failed to parse address", 'failure'))
-					return
-				} else {
-					nbn_req_data['streetNumber'] = number
-				}
-			}
-
-			sendNBNMessage({'type': 'lookup', 'data': nbn_req_data}, function(response) {
-				if (response.servingArea === null) {
-					sendResponse(responseObject(
-						"NBN is unavailable", 'unavailable'))
-				} else {
-					
-					sendResponse(responseObject(
-						response.servingArea.serviceType + " is " + response.servingArea.serviceStatus,
-						response.servingArea.serviceStatus))
-				}
-			})
-		} else {
-			console.log("Address lookup failed for %s: %O", address, geo)
-			if (geo.status == 'ZERO_RESULTS') {
-				sendResponse(responseObject(
-					"Unknown address", 'failure'))
-			} else if (geo.status == 'OVER_QUERY_LIMIT') {
-				sendResponse(responseObject(
-					"Over query limit (try reloading the page)", 'failure'))
-			} else {
-				sendResponse(responseObject(
-					"Failed to load address", 'failure'))
-			}
-		}
-	}
-
 	if (key in localStorage) {
-		withGeo(JSON.parse(localStorage[key]))
+		withGeo(address, key, sendResponse, JSON.parse(localStorage[key]))
 	} else {
 		$.getJSON(
 			'https://maps.googleapis.com/maps/api/geocode/json',
 			{"address": address, "sensor": false},
-			withGeo
+			$.proxy(withGeo, this, address, key, sendResponse)
 		)
 	}
 
