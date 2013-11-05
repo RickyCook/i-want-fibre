@@ -1,8 +1,10 @@
 {
   "manifest_version": 2,
 
-  "name": "NBN Check for RealEstate.com.au",
-  "description": "Checks NBN status for property list on realestate.com.au",
+  "name": "I Want Fibre",
+  "description": "Do you want NBN fibre to go with you shiney new place? Well
+    it's just annoying to manually check. I Want Fibre automatically checks NBN
+    status for property list on realestate.com.au",
   "version": "1.0",
 
   "background": {
@@ -15,12 +17,12 @@
     },
     {
       "matches": ["http://www.nbnco.com.au/*"],
+      "all_frames": true,
       "js": ["jquery-1.10.2.js", "nbn_content_script.js"]
     }
   ],
 
   "permissions": [
-    "https://realestate.com.au/",
     "http://www.nbnco.com.au/",
     "https://maps.googleapis.com/"
   ]
