@@ -1,7 +1,7 @@
-$('[rel="listingName"]').each(function(k, el) {
+$('[rel="listingName"],[itemprop="address"]').each(function(k, el) {
 	var
 		content_el = $('<h3 class="title">')[0],
-		data = {'type': 'lookup', 'address': el.text}
+		data = {'type': 'lookup', 'address': $(el).text()}
 
 	// Setup display
 	content_el.textContent = "Loading NBN Status"
