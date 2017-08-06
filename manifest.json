@@ -4,11 +4,7 @@
   "name": "I Want Fibre",
   "description": "Automatically check NBN status for property list and detail page on realestate.com.au",
   "homepage_url": "https://github.com/RickyCook/i-want-fibre",
-  "version": "0.4",
-
-  "icons": {
-    "128": "icon.png"
-  },
+  "version": "0.5",
 
   "background": {
     "page": "background.html"
