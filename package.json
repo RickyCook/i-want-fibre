@@ -1,6 +1,6 @@
 {
   "name": "i-want-fibre",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Chrome/Firefox extension for checking NBN status on REA property listings",
   "main": "src/index.js",
   "repository": {
