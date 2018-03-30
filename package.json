@@ -1,0 +1,16 @@
+{
+  "name": "i-want-fibre",
+  "version": "1.0.0",
+  "description": "Chrome/Firefox extension for checking NBN status on REA property listings",
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RickyCook/i-want-fibre.git"
+  },
+  "author": "Ricky Cook <i_want_fibre@auto.thatpanda.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RickyCook/i-want-fibre/issues"
+  },
+  "homepage": "https://github.com/RickyCook/i-want-fibre#readme"
+}
