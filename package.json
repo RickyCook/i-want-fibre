@@ -7,10 +7,34 @@
     "type": "git",
     "url": "git+https://github.com/RickyCook/i-want-fibre.git"
   },
+  "scripts": {
+    "build": "webpack",
+    "watch": "webpack --watch",
+    "dist": "npm run build && web-ext build --source-dir ./dist --artifacts-dir ./dist"
+  },
   "author": "Ricky Cook <i_want_fibre@auto.thatpanda.com>",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/RickyCook/i-want-fibre/issues"
   },
-  "homepage": "https://github.com/RickyCook/i-want-fibre#readme"
+  "homepage": "https://github.com/RickyCook/i-want-fibre#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.4",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "clean-webpack-plugin": "^0.1.19",
+    "file-loader": "^1.1.11",
+    "html-webpack-plugin": "^3.1.0",
+    "raw-loader": "^0.5.1",
+    "val-loader": "^1.1.0",
+    "web-ext": "^2.6.0",
+    "webpack": "^4.4.1",
+    "webpack-cli": "^2.0.13"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "react": "^16.3.0",
+    "react-dom": "^16.3.0"
+  }
 }
